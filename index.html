@@ -161,10 +161,10 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 // ── 상수 ────────────────────────────────────────────────
-const BRANDS=[{id:'samdae',name:'삼대오백',color:'#e8291c',bg:'rgba(232,41,28,.12)'},{id:'mxiv',name:'엠엑시브',color:'#2563eb',bg:'rgba(37,99,235,.12)'},{id:'etc',name:'유튜브',color:'#7c3aed',bg:'rgba(124,58,237,.12)'}];
+const BRANDS=[{id:'samdae',name:'삼대오백',color:'#e8291c',bg:'rgba(232,41,28,.12)'},{id:'mxiv',name:'엠엑시브',color:'#2563eb',bg:'rgba(37,99,235,.12)'}];
 const BM=Object.fromEntries(BRANDS.map(b=>[b.id,b]));
 const TYPES=['제품홍보','이벤트','후기','정보','밈','PPL','식단','운동','챌린지','브이로그'];
-const FORMATS=['릴스','피드','스토리','캐러셀','라이브'];
+const FORMATS=['릴스','피드','스토리','캐러셀','라이브','유튜브'];
 const STATUSES=[{k:'기획',c:'#6366f1',bg:'rgba(99,102,241,.12)'},{k:'제작중',c:'#ea580c',bg:'rgba(234,92,22,.12)'},{k:'검수',c:'#ca8a04',bg:'rgba(202,138,4,.12)'},{k:'완료',c:'#16a34a',bg:'rgba(22,163,74,.12)'},{k:'보류',c:'#6b7280',bg:'rgba(107,114,128,.12)'}];
 const PRIS=['높음','중간','낮음'];
 const VIRAL=['댓글유도','저장유도','참여형','공유유도','질문형','투표','챌린지','정보공유'];
