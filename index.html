@@ -29,6 +29,7 @@ html,body{height:100%;font-family:'Noto Sans KR',sans-serif;font-size:13px;backg
 .chip:hover{border-color:var(--red);color:var(--red);}.chip.on{background:var(--red);border-color:var(--red);color:#fff;}
 .sb-search{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:12px;font-family:inherit;outline:none;}
 .sb-search:focus{border-color:var(--red);}
+.sb-search::placeholder{color:var(--text3);}
 .rout-row{display:flex;align-items:center;gap:8px;padding:4px 8px;border-radius:7px;margin-bottom:2px;cursor:pointer;transition:background .13s;}
 .rout-row:hover{background:var(--bg3);}
 .rout-day{font-size:11px;font-weight:700;color:var(--red);width:22px;}
@@ -85,7 +86,7 @@ html,body{height:100%;font-family:'Noto Sans KR',sans-serif;font-size:13px;backg
 .wk-dh-d.td{display:inline-flex;width:32px;height:32px;background:var(--red);color:#fff;border-radius:50%;align-items:center;justify-content:center;font-size:18px;}
 .wk-cell{background:var(--bg);min-height:300px;padding:6px;cursor:pointer;border-right:1px solid var(--border);}
 .wk-cell:hover{background:#fafaf8;}.wk-cell.td{background:#fff8f8;}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;}
 .modal{background:var(--bg);border:1px solid var(--border);border-radius:16px;width:100%;max-width:800px;max-height:92vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.15);}
 .modal-hdr{padding:16px 20px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:1;display:flex;align-items:center;gap:10px;}
 .modal-date{background:rgba(232,41,28,.08);color:var(--red);font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;white-space:nowrap;}
@@ -101,7 +102,7 @@ html,body{height:100%;font-family:'Noto Sans KR',sans-serif;font-size:13px;backg
 .finput:focus,.fsel:focus,.fta:focus{border-color:var(--red);}
 .fta{resize:vertical;min-height:64px;}
 .st-row{display:flex;gap:5px;flex-wrap:wrap;}
-.st-pill{padding:5px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid;opacity:.45;user-select:none;}
+.st-pill{padding:5px 11px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid;opacity:.4;user-select:none;transition:opacity .13s;}
 .st-pill.on{opacity:1;}
 .viral-row{display:flex;gap:5px;flex-wrap:wrap;}
 .vtag{padding:4px 9px;border-radius:6px;font-size:11px;cursor:pointer;border:1px solid var(--border);color:var(--text2);background:var(--bg2);user-select:none;}
@@ -141,13 +142,12 @@ html,body{height:100%;font-family:'Noto Sans KR',sans-serif;font-size:13px;backg
 <body>
 <div id="loading" style="display:flex;align-items:center;justify-content:center;height:100vh;gap:10px;color:#555;">
   <div style="width:18px;height:18px;border:2px solid #eee;border-top-color:#e8291c;border-radius:50%;animation:spin .6s linear infinite;"></div>
-  Firebase 연결 중...
+  연결 중...
   <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 </div>
 <div id="app" class="app" style="display:none;"></div>
-
 <script>
-// Firebase 초기화
+// ── Firebase 초기화 ──────────────────────────────────────
 const firebaseConfig = {
   apiKey: "AIzaSyCupA_Esn47o0XJAbXSVnCN05SbQKTCi_k",
   authDomain: "samdae-mxssive.firebaseapp.com",
@@ -160,6 +160,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+// ── 상수 ────────────────────────────────────────────────
 const BRANDS=[{id:'samdae',name:'삼대오백',color:'#e8291c',bg:'rgba(232,41,28,.12)'},{id:'mxiv',name:'엠엑시브',color:'#2563eb',bg:'rgba(37,99,235,.12)'},{id:'etc',name:'기타',color:'#7c3aed',bg:'rgba(124,58,237,.12)'}];
 const BM=Object.fromEntries(BRANDS.map(b=>[b.id,b]));
 const TYPES=['제품홍보','이벤트','후기','정보','밈','PPL','식단','운동','챌린지','브이로그'];
@@ -170,6 +171,8 @@ const VIRAL=['댓글유도','저장유도','참여형','공유유도','질문형
 const DKO=['일','월','화','수','목','금','토'];
 const DEN=['SUN','MON','TUE','WED','THU','FRI','SAT'];
 const RTAGS=['식단','제품','후기','이벤트','운동','밈'];
+
+// ── 유틸 ────────────────────────────────────────────────
 const pad=n=>String(n).padStart(2,'0');
 const toDS=(y,m,d)=>`${y}-${pad(m)}-${pad(d)}`;
 const today=()=>{const d=new Date();return toDS(d.getFullYear(),d.getMonth()+1,d.getDate());};
@@ -182,39 +185,107 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function calDays(y,m){const tot=getDIM(y,m),first=getDow(y,m),prev=getDIM(y,m-1),days=[];for(let i=first-1;i>=0;i--){const pm=m===1?12:m-1,py=m===1?y-1:y;days.push({date:toDS(py,pm,prev-i),cur:false});}for(let d=1;d<=tot;d++)days.push({date:toDS(y,m,d),cur:true});const rem=42-days.length;for(let d=1;d<=rem;d++){const nm=m===12?1:m+1,ny=m===12?y+1:y;days.push({date:toDS(ny,nm,d),cur:false});}return days;}
 function weekDays(){const t=new Date(today()+'T00:00:00'),dow=t.getDay(),days=[];for(let i=0;i<7;i++){const d=new Date(t);d.setDate(d.getDate()-dow+i);days.push(toDS(d.getFullYear(),d.getMonth()+1,d.getDate()));}return days;}
 
-let S={year:new Date().getFullYear(),month:new Date().getMonth()+1,view:'month',data:{},routines:{0:null,1:null,2:null,3:null,4:null,5:null,6:null},filter:{brand:'',type:'',status:'',search:''},modal:null,sidebar:false,drag:null};
+// ── 앱 상태 ─────────────────────────────────────────────
+const S={
+  year:new Date().getFullYear(),
+  month:new Date().getMonth()+1,
+  view:'month',
+  data:{},
+  routines:{0:null,1:null,2:null,3:null,4:null,5:null,6:null},
+  filter:{brand:'',type:'',status:'',search:''},
+  modal:null,
+  sidebar:false,
+  drag:null,
+  // 모달 내부 상태 (render와 분리)
+  mSt:'기획', mViral:[], mImg:'', mBrand:'samdae'
+};
 
-// Firebase 리스너
-db.ref('items').on('value',snap=>{S.data=snap.val()||{};render();});
-db.ref('routines').on('value',snap=>{S.routines=snap.val()||{0:null,1:null,2:null,3:null,4:null,5:null,6:null};render();});
+// ── Firebase 리스너 (한 번만 등록) ──────────────────────
+let fbReady=false;
+db.ref('items').on('value', snap=>{
+  S.data = snap.val()||{};
+  if(fbReady) renderCalOnly(); // 캘린더 영역만 갱신 (모달 건드리지 않음)
+});
+db.ref('routines').on('value', snap=>{
+  S.routines = snap.val()||{0:null,1:null,2:null,3:null,4:null,5:null,6:null};
+  if(fbReady) renderCalOnly();
+});
 
-// 로딩 숨기고 앱 표시
+// 1.5초 후 로딩 숨기고 앱 표시
 setTimeout(()=>{
+  fbReady=true;
   document.getElementById('loading').style.display='none';
   document.getElementById('app').style.display='flex';
-  render();
+  renderFull();
 },1500);
 
-function fbSave(item){db.ref(`items/${item.date.replace(/-/g,'_')}/${item.id}`).set(item);}
-function fbDel(id,date){db.ref(`items/${date.replace(/-/g,'_')}/${id}`).remove();}
-function fbMove(id,from,to){const b=S.data[from.replace(/-/g,'_')];const item=b&&(Array.isArray(b)?b.find(x=>x.id===id):b[id]);if(!item)return;db.ref(`items/${from.replace(/-/g,'_')}/${id}`).remove();db.ref(`items/${to.replace(/-/g,'_')}/${id}`).set({...item,date:to});}
+// ── Firebase CRUD ────────────────────────────────────────
+function fbSave(item){
+  db.ref(`items/${item.date.replace(/-/g,'_')}/${item.id}`).set(item);
+}
+function fbDel(id,date){
+  db.ref(`items/${date.replace(/-/g,'_')}/${id}`).remove();
+}
+function fbMove(id,from,to){
+  const b=S.data[from.replace(/-/g,'_')];
+  const item=b&&(Array.isArray(b)?b.find(x=>x.id===id):b[id]);
+  if(!item)return;
+  db.ref(`items/${from.replace(/-/g,'_')}/${id}`).remove();
+  db.ref(`items/${to.replace(/-/g,'_')}/${id}`).set({...item,date:to});
+}
 function fbRout(r){db.ref('routines').set(r);}
 
-function getItems(date){const k=date.replace(/-/g,'_'),b=S.data[k];if(!b)return[];return Array.isArray(b)?b:Object.values(b);}
-function filt(items){return items.filter(x=>{const f=S.filter;if(f.brand&&x.brand!==f.brand)return false;if(f.type&&x.type!==f.type)return false;if(f.status&&x.status!==f.status)return false;if(f.search){const q=f.search.toLowerCase();return x.title.toLowerCase().includes(q)||(x.hashtags||[]).some(h=>h.toLowerCase().includes(q));}return true;});}
+// ── 데이터 헬퍼 ─────────────────────────────────────────
+function getItems(date){
+  const k=date.replace(/-/g,'_'),b=S.data[k];
+  if(!b)return[];
+  return Array.isArray(b)?b:Object.values(b);
+}
+function filt(items){
+  return items.filter(x=>{
+    const f=S.filter;
+    if(f.brand&&x.brand!==f.brand)return false;
+    if(f.type&&x.type!==f.type)return false;
+    if(f.status&&x.status!==f.status)return false;
+    if(f.search){const q=f.search.toLowerCase();return x.title.toLowerCase().includes(q)||(x.hashtags||[]).some(h=>h.toLowerCase().includes(q));}
+    return true;
+  });
+}
+function blank(date){
+  return{id:genId(),date,brand:'samdae',title:'',type:'',format:'',message:'',caption:'',hashtags:[],cta:'',status:'기획',assignee:'',priority:'중간',viral:[],metrics:{likes:0,comments:0,saves:0,shares:0},image:''};
+}
 
+// ── Toast ────────────────────────────────────────────────
 let _tt;
-function toast(msg){let el=document.getElementById('_t');if(!el){el=document.createElement('div');el.id='_t';document.body.appendChild(el);}el.innerHTML=`<div class="toast">${msg}</div>`;clearTimeout(_tt);_tt=setTimeout(()=>{el.innerHTML='';},2200);}
-function blank(date){return{id:genId(),date,brand:'samdae',title:'',type:'',format:'',message:'',caption:'',hashtags:[],cta:'',status:'기획',assignee:'',priority:'중간',viral:[],metrics:{likes:0,comments:0,saves:0,shares:0},image:''};}
+function toast(msg){
+  let el=document.getElementById('_toast');
+  if(!el){el=document.createElement('div');el.id='_toast';document.body.appendChild(el);}
+  el.innerHTML=`<div class="toast">${msg}</div>`;
+  clearTimeout(_tt);_tt=setTimeout(()=>{el.innerHTML='';},2200);
+}
 
-function render(){
-  const app=document.getElementById('app');
-  if(!app)return;
+// ── 렌더링: 전체 vs 캘린더만 ────────────────────────────
+function renderFull(){
+  document.getElementById('app').innerHTML=buildApp();
+  bindAll();
+}
+function renderCalOnly(){
+  // 모달이 열려있으면 캘린더만 조용히 갱신
+  const cw=document.querySelector('.cal-wrap');
+  if(cw) cw.innerHTML=S.view==='month'?buildMonth(today()):buildWeek(today());
+  // 통계바 갱신
+  const sb=document.querySelector('.statsbar');
+  if(sb) sb.innerHTML=buildStatsBar();
+  // 드래그 이벤트 재바인딩
+  bindDrag();
+}
+
+// ── HTML 빌더 ────────────────────────────────────────────
+function buildApp(){
   const tS=today();
   const all=Object.values(S.data).flatMap(b=>Array.isArray(b)?b:Object.values(b));
-  const sc=Object.fromEntries(STATUSES.map(s=>[s.k,all.filter(x=>x.status===s.k).length]));
   const hf=Object.values(S.filter).some(Boolean);
-  app.innerHTML=`
+  return`
 ${S.sidebar?'<div class="sb-overlay open" id="sbo"></div>':''}
 <div class="sidebar${S.sidebar?' open':''}" id="sb">
   <div class="sb-logo"><div class="sb-mark">캘</div><div><div class="sb-name">콘텐츠 캘린더</div><div class="sb-sub">마케팅 팀 공유 플래너</div></div></div>
@@ -239,76 +310,273 @@ ${S.sidebar?'<div class="sb-overlay open" id="sbo"></div>':''}
     <div class="view-toggle"><button class="vbtn${S.view==='month'?' on':''}" data-view="month">월간</button><button class="vbtn${S.view==='week'?' on':''}" data-view="week">주간</button></div>
     <div class="tb-right"><div class="live-dot"><div class="live-pulse"></div>실시간 연결됨</div><button class="add-btn-top" id="ta">＋ 콘텐츠</button></div>
   </div>
-  <div class="statsbar">
-    ${STATUSES.map(s=>`<div class="stat-item"><div class="stat-dot" style="background:${s.c}"></div><span class="stat-lbl">${s.k}</span><span class="stat-val" style="color:${s.c}">${sc[s.k]||0}</span></div>`).join('')}
-    <div class="stat-item" style="margin-left:10px">${BRANDS.map(b=>`<div class="stat-dot" style="background:${b.color};margin-right:3px"></div><span class="stat-lbl" style="margin-right:8px">${b.name} ${all.filter(x=>x.brand===b.id).length}</span>`).join('')}</div>
-    ${hf?`<button class="clr-btn" id="cf">필터 초기화 ✕</button>`:''}
-  </div>
+  <div class="statsbar">${buildStatsBar()}</div>
   <div class="cal-wrap">${S.view==='month'?buildMonth(tS):buildWeek(tS)}</div>
 </div>
 ${S.modal?buildModal():''}`;
-  bind();
 }
 
-function buildMonth(tS){const days=calDays(S.year,S.month);return`<div class="cal-grid">${DEN.map((d,i)=>`<div class="dh${i===0?' sun':i===6?' sat':''}">${d}</div>`).join('')}${days.map(d=>buildCell(d,tS)).join('')}</div>`;}
-function buildCell({date,cur},tS){const dow=new Date(date+'T00:00:00').getDay(),isT=date===tS,items=filt(getItems(date)),n=parseInt(date.split('-')[2]),rout=S.routines[String(dow)];let nc=dow===0?'sun-c':dow===6?'sat-c':'';if(isT)nc='td-c';return`<div class="day-cell${!cur?' other':''}${isT?' today':''}" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="dDrop(event,'${date}')">${rout?`<div class="rout-badge">${rout}</div>`:''}<div class="day-num ${nc}">${n}</div>${items.map(x=>card(x)).join('')}${cur?`<button class="cell-add" onclick="oAdd('${date}',event)">＋ 추가</button>`:''}</div>`;}
-function buildWeek(tS){const days=weekDays();return`<div class="week-grid">${days.map(date=>{const dow=new Date(date+'T00:00:00').getDay(),isT=date===tS,n=parseInt(date.split('-')[2]);return`<div class="wk-dh"><div class="wk-dh-n">${DEN[dow]}</div><div class="wk-dh-d${isT?' td':''}">${n}</div></div>`;}).join('')}${days.map(date=>{const isT=date===tS,items=filt(getItems(date));return`<div class="wk-cell${isT?' td':''}" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="dDrop(event,'${date}')">${items.map(x=>card(x)).join('')}<button class="cell-add" onclick="oAdd('${date}',event)">＋ 추가</button></div>`;}).join('')}</div>`;}
-function card(x){const st=getSt(x.status),br=getBrand(x.brand),meta=[x.format,x.type,x.assignee].filter(Boolean).join(' · ');return`<div class="c-card" style="background:${st.bg};border-left-color:${st.c};color:${st.c}" draggable="true" ondragstart="dStart(event,'${x.id}','${x.date}')" ondragend="dEnd(event)" onclick="oEdit('${x.id}','${x.date}',event)">${x.image?`<img src="${esc(x.image)}" style="width:100%;height:34px;object-fit:cover;border-radius:3px;margin-bottom:3px;" alt="">`:''}<div style="display:flex;align-items:center;gap:2px"><span class="brand-badge" style="background:${br.color}22;color:${br.color}">${br.name}</span><span class="c-card-title">${esc(x.title||'(제목없음)')}</span></div><div class="c-card-meta">${esc(meta)}</div></div>`;}
+function buildStatsBar(){
+  const all=Object.values(S.data).flatMap(b=>Array.isArray(b)?b:Object.values(b));
+  const sc=Object.fromEntries(STATUSES.map(s=>[s.k,all.filter(x=>x.status===s.k).length]));
+  const hf=Object.values(S.filter).some(Boolean);
+  return`${STATUSES.map(s=>`<div class="stat-item"><div class="stat-dot" style="background:${s.c}"></div><span class="stat-lbl">${s.k}</span><span class="stat-val" style="color:${s.c}">${sc[s.k]||0}</span></div>`).join('')}
+  <div class="stat-item" style="margin-left:10px">${BRANDS.map(b=>`<div class="stat-dot" style="background:${b.color};margin-right:3px"></div><span class="stat-lbl" style="margin-right:8px">${b.name} ${all.filter(x=>x.brand===b.id).length}</span>`).join('')}</div>
+  ${hf?`<button class="clr-btn" id="cf">필터 초기화 ✕</button>`:''}`;
+}
 
-let mSt='기획',mViral=[],mImg='',mBrand='samdae';
-function buildModal(){const m=S.modal;if(m.type==='rout')return buildRout();const x=m.item||blank(m.date);mSt=x.status||'기획';mViral=[...(x.viral||[])];mImg=x.image||'';mBrand=x.brand||'samdae';const hs=(x.hashtags||[]).join(' '),hp=(x.hashtags||[]).map(h=>`<span class="hash-tag">${esc(h)}</span>`).join('');return`<div class="overlay" id="ov"><div class="modal" onclick="event.stopPropagation()"><div class="modal-hdr"><span class="modal-date">📅 ${m.date}</span><input class="modal-title-inp" id="mt" placeholder="콘텐츠 제목..." value="${esc(x.title)}"><button class="modal-close" id="mc">✕</button></div><div class="modal-body"><div class="sdiv">브랜드</div><div style="display:flex;gap:6px;flex-wrap:wrap">${BRANDS.map(b=>`<button class="brand-btn${x.brand===b.id?' on':''}" data-mb="${b.id}" style="padding:5px 12px;${x.brand===b.id?'color:'+b.color+';border-color:'+b.color:''}"><span class="brand-dot" style="background:${b.color}"></span>${b.name}</button>`).join('')}</div><div class="sdiv">상태</div><div class="st-row">${STATUSES.map(s=>`<span class="st-pill${x.status===s.k?' on':''}" style="color:${s.c};border-color:${s.c};${x.status===s.k?'background:'+s.bg:''}" data-ms="${s.k}">${s.k}</span>`).join('')}</div><div class="sdiv">기본 정보</div><div class="fg2"><div class="fg"><label class="flabel">콘텐츠 유형</label><select class="fsel" id="mty"><option value="">선택</option>${TYPES.map(t=>`<option value="${t}"${x.type===t?' selected':''}>${t}</option>`).join('')}</select></div><div class="fg"><label class="flabel">포맷</label><select class="fsel" id="mfm"><option value="">선택</option>${FORMATS.map(f=>`<option value="${f}"${x.format===f?' selected':''}>${f}</option>`).join('')}</select></div><div class="fg"><label class="flabel">담당자</label><input class="finput" id="mas" placeholder="이름" value="${esc(x.assignee)}"></div><div class="fg"><label class="flabel">우선순위</label><select class="fsel" id="mpr">${PRIS.map(p=>`<option value="${p}"${x.priority===p?' selected':''}>${p}</option>`).join('')}</select></div><div class="fg full"><label class="flabel">핵심 메시지</label><input class="finput" id="mmg" value="${esc(x.message)}"></div><div class="fg full"><label class="flabel">캡션</label><textarea class="fta" id="mcp" rows="3">${esc(x.caption)}</textarea></div><div class="fg full"><label class="flabel">해시태그</label><textarea class="fta" id="mht" rows="2">${esc(hs)}</textarea><div class="hash-prev" id="hp">${hp}</div></div><div class="fg full"><label class="flabel">CTA</label><input class="finput" id="mct" value="${esc(x.cta)}"></div></div><div class="sdiv">바이럴 요소</div><div class="viral-row">${VIRAL.map(v=>`<span class="vtag${(x.viral||[]).includes(v)?' on':''}" data-mv="${v}">${v}</span>`).join('')}</div><div class="sdiv">이미지</div>${x.image?`<img src="${esc(x.image)}" class="img-prev" id="ip" alt="">`:'<div id="ip"></div>'}<div class="img-zone" id="iz"><div style="font-size:20px;margin-bottom:4px">🖼️</div><div style="font-size:11px;color:#555">클릭하여 업로드</div></div><input type="file" accept="image/*" id="if" style="display:none"><input class="finput" id="miu" style="margin-top:6px" placeholder="이미지 URL" value="${!x.image||x.image.startsWith('data:')?'':esc(x.image)}"><div class="sdiv">성과 기록</div><div class="met-row">${[['likes','❤️','좋아요'],['comments','💬','댓글'],['saves','🔖','저장'],['shares','📤','공유']].map(([k,ic,lb])=>`<div class="met-box"><div class="met-icon">${ic}</div><input class="met-inp" type="number" min="0" id="m${k}" value="${(x.metrics||{})[k]||0}"><div class="met-lbl">${lb}</div></div>`).join('')}</div></div><div class="modal-footer">${m.item?`<button class="btn btn-d" id="mdel">삭제</button>`:''}<div style="flex:1"></div><button class="btn btn-g" id="mcc">취소</button><button class="btn btn-p" id="msv">저장</button></div></div></div>`;}
-function buildRout(){return`<div class="overlay" id="ov"><div class="rout-modal" onclick="event.stopPropagation()"><h3 style="font-size:15px;font-weight:800;margin-bottom:5px">📅 요일별 루틴 설정</h3><p style="font-size:11px;color:#555;margin-bottom:14px;line-height:1.5">요일별 반복 콘텐츠를 설정하면 캘린더에 자동 표시됩니다.</p>${DKO.map((d,i)=>`<div style="margin-bottom:9px"><div style="font-size:11px;font-weight:700;color:#555;margin-bottom:4px">${d}요일</div><div class="chips"><span class="chip${!S.routines[i]?' on':''}" data-rd="${i}" data-rv="">없음</span>${RTAGS.map(t=>`<span class="chip${S.routines[i]===t?' on':''}" data-rd="${i}" data-rv="${t}">${t}</span>`).join('')}</div></div>`).join('')}<div style="display:flex;gap:8px;margin-top:18px"><button class="btn btn-p" style="flex:1" id="rsv">저장</button><button class="btn btn-g" id="rcn">취소</button></div></div></div>`;}
+function buildMonth(tS){
+  const days=calDays(S.year,S.month);
+  return`<div class="cal-grid">${DEN.map((d,i)=>`<div class="dh${i===0?' sun':i===6?' sat':''}">${d}</div>`).join('')}${days.map(d=>buildCell(d,tS)).join('')}</div>`;
+}
+function buildCell({date,cur},tS){
+  const dow=new Date(date+'T00:00:00').getDay(),isT=date===tS;
+  const items=filt(getItems(date)),n=parseInt(date.split('-')[2]),rout=S.routines[String(dow)];
+  let nc=dow===0?'sun-c':dow===6?'sat-c':'';if(isT)nc='td-c';
+  return`<div class="day-cell${!cur?' other':''}${isT?' today':''}" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="dDrop(event,'${date}')">${rout?`<div class="rout-badge">${rout}</div>`:''}<div class="day-num ${nc}">${n}</div>${items.map(x=>card(x)).join('')}${cur?`<button class="cell-add" onclick="oAdd('${date}',event)">＋ 추가</button>`:''}</div>`;
+}
+function buildWeek(tS){
+  const days=weekDays();
+  return`<div class="week-grid">${days.map(date=>{const dow=new Date(date+'T00:00:00').getDay(),isT=date===tS,n=parseInt(date.split('-')[2]);return`<div class="wk-dh"><div class="wk-dh-n">${DEN[dow]}</div><div class="wk-dh-d${isT?' td':''}">${n}</div></div>`;}).join('')}${days.map(date=>{const isT=date===tS,items=filt(getItems(date));return`<div class="wk-cell${isT?' td':''}" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="dDrop(event,'${date}')">${items.map(x=>card(x)).join('')}<button class="cell-add" onclick="oAdd('${date}',event)">＋ 추가</button></div>`;}).join('')}</div>`;
+}
+function card(x){
+  const st=getSt(x.status),br=getBrand(x.brand),meta=[x.format,x.type,x.assignee].filter(Boolean).join(' · ');
+  return`<div class="c-card" style="background:${st.bg};border-left-color:${st.c};color:${st.c}" draggable="true" ondragstart="dStart(event,'${x.id}','${x.date}')" ondragend="dEnd(event)" onclick="oEdit('${x.id}','${x.date}',event)">${x.image?`<img src="${esc(x.image)}" style="width:100%;height:34px;object-fit:cover;border-radius:3px;margin-bottom:3px;" alt="">`:''}<div style="display:flex;align-items:center;gap:2px"><span class="brand-badge" style="background:${br.color}22;color:${br.color}">${br.name}</span><span class="c-card-title">${esc(x.title||'(제목없음)')}</span></div><div class="c-card-meta">${esc(meta)}</div></div>`;
+}
 
+// ── 모달 빌더 ────────────────────────────────────────────
+function buildModal(){
+  const m=S.modal;
+  if(m.type==='rout')return buildRout();
+  const x=m.item||blank(m.date);
+  // 모달 상태 초기화 (새로 열 때만)
+  if(!m._initialized){
+    S.mSt=x.status||'기획';
+    S.mViral=[...(x.viral||[])];
+    S.mImg=x.image||'';
+    S.mBrand=x.brand||'samdae';
+    m._initialized=true;
+  }
+  const hs=(x.hashtags||[]).join(' '),hp=(x.hashtags||[]).map(h=>`<span class="hash-tag">${esc(h)}</span>`).join('');
+  return`<div class="overlay" id="ov"><div class="modal" onclick="event.stopPropagation()">
+<div class="modal-hdr"><span class="modal-date">📅 ${m.date}</span><input class="modal-title-inp" id="mt" placeholder="콘텐츠 제목..." value="${esc(x.title)}"><button class="modal-close" id="mc">✕</button></div>
+<div class="modal-body">
+<div class="sdiv">브랜드</div>
+<div style="display:flex;gap:6px;flex-wrap:wrap">${BRANDS.map(b=>`<button class="brand-btn${S.mBrand===b.id?' on':''}" data-mb="${b.id}" style="padding:5px 12px;${S.mBrand===b.id?'color:'+b.color+';border-color:'+b.color:''}"><span class="brand-dot" style="background:${b.color}"></span>${b.name}</button>`).join('')}</div>
+<div class="sdiv">상태</div>
+<div class="st-row">${STATUSES.map(s=>`<span class="st-pill${S.mSt===s.k?' on':''}" style="color:${s.c};border-color:${s.c};${S.mSt===s.k?'background:'+s.bg:''}" data-ms="${s.k}">${s.k}</span>`).join('')}</div>
+<div class="sdiv">기본 정보</div>
+<div class="fg2">
+<div class="fg"><label class="flabel">콘텐츠 유형</label><select class="fsel" id="mty"><option value="">선택</option>${TYPES.map(t=>`<option value="${t}"${x.type===t?' selected':''}>${t}</option>`).join('')}</select></div>
+<div class="fg"><label class="flabel">포맷</label><select class="fsel" id="mfm"><option value="">선택</option>${FORMATS.map(f=>`<option value="${f}"${x.format===f?' selected':''}>${f}</option>`).join('')}</select></div>
+<div class="fg"><label class="flabel">담당자</label><input class="finput" id="mas" placeholder="이름" value="${esc(x.assignee)}"></div>
+<div class="fg"><label class="flabel">우선순위</label><select class="fsel" id="mpr">${PRIS.map(p=>`<option value="${p}"${x.priority===p?' selected':''}>${p}</option>`).join('')}</select></div>
+<div class="fg full"><label class="flabel">핵심 메시지</label><input class="finput" id="mmg" value="${esc(x.message)}"></div>
+<div class="fg full"><label class="flabel">캡션</label><textarea class="fta" id="mcp" rows="3">${esc(x.caption)}</textarea></div>
+<div class="fg full"><label class="flabel">해시태그</label><textarea class="fta" id="mht" rows="2">${esc(hs)}</textarea><div class="hash-prev" id="hp">${hp}</div></div>
+<div class="fg full"><label class="flabel">CTA</label><input class="finput" id="mct" value="${esc(x.cta)}"></div>
+</div>
+<div class="sdiv">바이럴 요소</div>
+<div class="viral-row">${VIRAL.map(v=>`<span class="vtag${S.mViral.includes(v)?' on':''}" data-mv="${v}">${v}</span>`).join('')}</div>
+<div class="sdiv">이미지</div>
+${S.mImg?`<img src="${esc(S.mImg)}" class="img-prev" id="ip" alt="">`:'<div id="ip"></div>'}
+<div class="img-zone" id="iz"><div style="font-size:20px;margin-bottom:4px">🖼️</div><div style="font-size:11px;color:#555">클릭하여 업로드</div></div>
+<input type="file" accept="image/*" id="if" style="display:none">
+<input class="finput" id="miu" style="margin-top:6px" placeholder="이미지 URL" value="${!S.mImg||S.mImg.startsWith('data:')?'':esc(S.mImg)}">
+<div class="sdiv">성과 기록</div>
+<div class="met-row">${[['likes','❤️','좋아요'],['comments','💬','댓글'],['saves','🔖','저장'],['shares','📤','공유']].map(([k,ic,lb])=>`<div class="met-box"><div class="met-icon">${ic}</div><input class="met-inp" type="number" min="0" id="m_${k}" value="${(x.metrics||{})[k]||0}"><div class="met-lbl">${lb}</div></div>`).join('')}</div>
+</div>
+<div class="modal-footer">${m.item?`<button class="btn btn-d" id="mdel">삭제</button>`:''}<div style="flex:1"></div><button class="btn btn-g" id="mcc">취소</button><button class="btn btn-p" id="msv">저장</button></div>
+</div></div>`;
+}
+
+function buildRout(){
+  return`<div class="overlay" id="ov"><div class="rout-modal" onclick="event.stopPropagation()"><h3 style="font-size:15px;font-weight:800;margin-bottom:5px">📅 요일별 루틴 설정</h3><p style="font-size:11px;color:#555;margin-bottom:14px;line-height:1.5">요일별 반복 콘텐츠를 설정하면 캘린더에 자동 표시됩니다.</p>${DKO.map((d,i)=>`<div style="margin-bottom:9px"><div style="font-size:11px;font-weight:700;color:#555;margin-bottom:4px">${d}요일</div><div class="chips"><span class="chip${!S.routines[i]?' on':''}" data-rd="${i}" data-rv="">없음</span>${RTAGS.map(t=>`<span class="chip${S.routines[i]===t?' on':''}" data-rd="${i}" data-rv="${t}">${t}</span>`).join('')}</div></div>`).join('')}<div style="display:flex;gap:8px;margin-top:18px"><button class="btn btn-p" style="flex:1" id="rsv">저장</button><button class="btn btn-g" id="rcn">취소</button></div></div></div>`;
+}
+
+// ── 이벤트 바인딩 ────────────────────────────────────────
 const $=s=>document.querySelector(s);
 const $$=s=>document.querySelectorAll(s);
-function bind(){
-  $('#mb')?.addEventListener('click',()=>{S.sidebar=!S.sidebar;render();});
-  $('#sbo')?.addEventListener('click',()=>{S.sidebar=false;render();});
-  $('#pv')?.addEventListener('click',()=>{S.month--;if(S.month<1){S.month=12;S.year--;}render();});
-  $('#nx')?.addEventListener('click',()=>{S.month++;if(S.month>12){S.month=1;S.year++;}render();});
-  $('#ys')?.addEventListener('change',e=>{S.year=+e.target.value;render();});
-  $('#ms')?.addEventListener('change',e=>{S.month=+e.target.value;render();});
-  $('#td')?.addEventListener('click',()=>{const d=new Date();S.year=d.getFullYear();S.month=d.getMonth()+1;render();});
-  $$('[data-view]').forEach(el=>el.addEventListener('click',()=>{S.view=el.dataset.view;render();}));
-  $$('[data-brand]').forEach(el=>el.addEventListener('click',()=>{S.filter.brand=el.dataset.brand;render();}));
-  $$('[data-fs]').forEach(el=>el.addEventListener('click',()=>{const v=el.dataset.fs;S.filter.status=S.filter.status===v?'':v;render();}));
-  $$('[data-ft]').forEach(el=>el.addEventListener('click',()=>{const v=el.dataset.ft;S.filter.type=S.filter.type===v?'':v;render();}));
-  $('#ss')?.addEventListener('input',e=>{S.filter.search=e.target.value;render();});
-  $('#cf')?.addEventListener('click',()=>{S.filter={brand:'',type:'',status:'',search:''};render();});
+
+function bindAll(){
+  // 사이드바
+  $('#mb')?.addEventListener('click',()=>{S.sidebar=!S.sidebar;renderFull();});
+  $('#sbo')?.addEventListener('click',()=>{S.sidebar=false;renderFull();});
+  // 네비
+  $('#pv')?.addEventListener('click',()=>{S.month--;if(S.month<1){S.month=12;S.year--;}renderFull();});
+  $('#nx')?.addEventListener('click',()=>{S.month++;if(S.month>12){S.month=1;S.year++;}renderFull();});
+  $('#ys')?.addEventListener('change',e=>{S.year=+e.target.value;renderFull();});
+  $('#ms')?.addEventListener('change',e=>{S.month=+e.target.value;renderFull();});
+  $('#td')?.addEventListener('click',()=>{const d=new Date();S.year=d.getFullYear();S.month=d.getMonth()+1;renderFull();});
+  $$('[data-view]').forEach(el=>el.addEventListener('click',()=>{S.view=el.dataset.view;renderFull();}));
+  // 필터
+  $$('[data-brand]').forEach(el=>el.addEventListener('click',()=>{S.filter.brand=el.dataset.brand;renderFull();}));
+  $$('[data-fs]').forEach(el=>el.addEventListener('click',()=>{const v=el.dataset.fs;S.filter.status=S.filter.status===v?'':v;renderFull();}));
+  $$('[data-ft]').forEach(el=>el.addEventListener('click',()=>{const v=el.dataset.ft;S.filter.type=S.filter.type===v?'':v;renderFull();}));
+  $('#ss')?.addEventListener('input',e=>{S.filter.search=e.target.value;renderFull();});
+  $('#cf')?.addEventListener('click',()=>{S.filter={brand:'',type:'',status:'',search:''};renderFull();});
+  // 내보내기/가져오기
   $('#exb')?.addEventListener('click',()=>{const blob=new Blob([JSON.stringify({items:S.data,routines:S.routines},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`calendar_${today()}.json`;a.click();toast('📤 내보내기 완료');});
   $('#imb')?.addEventListener('click',()=>$('#imf').click());
   $('#imf')?.addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;const j=JSON.parse(await f.text());if(j.items)db.ref('items').set(j.items);if(j.routines)db.ref('routines').set(j.routines);toast('📥 가져오기 완료');});
-  $('#rb')?.addEventListener('click',()=>{S.modal={type:'rout'};render();bind();});
-  for(let i=0;i<7;i++)$(`#rr${i}`)?.addEventListener('click',()=>{S.modal={type:'rout'};render();bind();});
+  // 루틴
+  $('#rb')?.addEventListener('click',()=>{S.modal={type:'rout'};renderFull();});
+  for(let i=0;i<7;i++)$(`#rr${i}`)?.addEventListener('click',()=>{S.modal={type:'rout'};renderFull();});
+  // 콘텐츠 추가
   $('#ta')?.addEventListener('click',()=>oAdd(toDS(S.year,S.month,new Date().getDate())));
-  $('#ov')?.addEventListener('click',()=>{S.modal=null;render();});
+  // 오버레이 닫기
+  $('#ov')?.addEventListener('click',()=>{S.modal=null;renderFull();});
+  // 드래그
+  bindDrag();
+  // 모달
   bindModal();
 }
+
+function bindDrag(){
+  // 드래그 이벤트는 inline onclick으로 처리하므로 별도 바인딩 불필요
+}
+
 function bindModal(){
-  const m=S.modal;if(!m)return;
+  const m=S.modal;
+  if(!m)return;
   if(m.type==='rout'){
-    $$('[data-rd]').forEach(el=>{el.addEventListener('click',()=>{const d=el.dataset.rd,v=el.dataset.rv||null;$$(`[data-rd="${d}"]`).forEach(c=>c.classList.remove('on'));el.classList.add('on');S.routines={...S.routines,[d]:v};});});
-    $('#rsv')?.addEventListener('click',()=>{fbRout(S.routines);S.modal=null;render();toast('🔄 루틴 저장 완료');});
-    $('#rcn')?.addEventListener('click',()=>{S.modal=null;render();});
+    $$('[data-rd]').forEach(el=>{
+      el.addEventListener('click',()=>{
+        const d=el.dataset.rd,v=el.dataset.rv||null;
+        $$(`[data-rd="${d}"]`).forEach(c=>c.classList.remove('on'));
+        el.classList.add('on');
+        S.routines={...S.routines,[d]:v};
+      });
+    });
+    $('#rsv')?.addEventListener('click',()=>{fbRout(S.routines);S.modal=null;renderFull();toast('🔄 루틴 저장 완료');});
+    $('#rcn')?.addEventListener('click',()=>{S.modal=null;renderFull();});
     return;
   }
-  $('#mc')?.addEventListener('click',()=>{S.modal=null;render();});
-  $('#mcc')?.addEventListener('click',()=>{S.modal=null;render();});
-  $$('[data-mb]').forEach(el=>{el.addEventListener('click',()=>{mBrand=el.dataset.mb;const br=getBrand(mBrand);$$('[data-mb]').forEach(e=>{e.style.color=e.dataset.mb===mBrand?br.color:'';e.style.borderColor=e.dataset.mb===mBrand?br.color:'';e.classList.toggle('on',e.dataset.mb===mBrand);});});});
-  $$('[data-ms]').forEach(el=>{el.addEventListener('click',()=>{mSt=el.dataset.ms;$$('[data-ms]').forEach(e=>{const s=getSt(e.dataset.ms);e.classList.toggle('on',e.dataset.ms===mSt);e.style.background=e.dataset.ms===mSt?s.bg:'';});});});
-  $$('[data-mv]').forEach(el=>{el.addEventListener('click',()=>{const v=el.dataset.mv;if(mViral.includes(v))mViral=mViral.filter(x=>x!==v);else mViral.push(v);el.classList.toggle('on',mViral.includes(v));});});
-  $('#mht')?.addEventListener('input',e=>{const tags=e.target.value.split(/[\s,]+/).filter(h=>h.startsWith('#')&&h.length>1);$('#hp').innerHTML=tags.map(h=>`<span class="hash-tag">${esc(h)}</span>`).join('');});
+  // 모달 닫기
+  $('#mc')?.addEventListener('click',()=>{S.modal=null;renderFull();});
+  $('#mcc')?.addEventListener('click',()=>{S.modal=null;renderFull();});
+  // 브랜드 선택
+  $$('[data-mb]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      S.mBrand=el.dataset.mb;
+      const br=getBrand(S.mBrand);
+      $$('[data-mb]').forEach(e=>{
+        e.style.color=e.dataset.mb===S.mBrand?br.color:'';
+        e.style.borderColor=e.dataset.mb===S.mBrand?br.color:'';
+        e.classList.toggle('on',e.dataset.mb===S.mBrand);
+      });
+    });
+  });
+  // 상태 선택 — 클릭 즉시 S.mSt 갱신
+  $$('[data-ms]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      S.mSt=el.dataset.ms;
+      $$('[data-ms]').forEach(e=>{
+        const s=getSt(e.dataset.ms);
+        e.classList.toggle('on',e.dataset.ms===S.mSt);
+        e.style.background=e.dataset.ms===S.mSt?s.bg:'';
+        e.style.opacity=e.dataset.ms===S.mSt?'1':'0.4';
+      });
+    });
+  });
+  // 바이럴
+  $$('[data-mv]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const v=el.dataset.mv;
+      if(S.mViral.includes(v))S.mViral=S.mViral.filter(x=>x!==v);
+      else S.mViral.push(v);
+      el.classList.toggle('on',S.mViral.includes(v));
+    });
+  });
+  // 해시태그 미리보기
+  $('#mht')?.addEventListener('input',e=>{
+    const tags=e.target.value.split(/[\s,]+/).filter(h=>h.startsWith('#')&&h.length>1);
+    $('#hp').innerHTML=tags.map(h=>`<span class="hash-tag">${esc(h)}</span>`).join('');
+  });
+  // 이미지
   $('#iz')?.addEventListener('click',()=>$('#if').click());
-  $('#if')?.addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{mImg=ev.target.result;const p=$('#ip');if(p.tagName==='IMG')p.src=mImg;else{const img=document.createElement('img');img.src=mImg;img.className='img-prev';img.id='ip';p.replaceWith(img);}};r.readAsDataURL(f);});
-  $('#miu')?.addEventListener('input',e=>{mImg=e.target.value;});
-  $('#mdel')?.addEventListener('click',()=>{if(confirm('삭제하시겠습니까?')){fbDel(m.item.id,m.item.date);S.modal=null;toast('🗑️ 삭제됨');}});
-  $('#msv')?.addEventListener('click',()=>{const hr=$('#mht').value,ht=hr.split(/[\s,]+/).filter(h=>h.startsWith('#')&&h.length>1),iu=$('#miu').value;const it={...(m.item||blank(m.date)),brand:mBrand,title:$('#mt').value.trim(),type:$('#mty').value,format:$('#mfm').value,assignee:$('#mas').value,priority:$('#mpr').value,message:$('#mmg').value,caption:$('#mcp').value,hashtags:ht,cta:$('#mct').value,status:mSt,viral:mViral,image:mImg||iu,metrics:{likes:parseInt($('#mlikes').value)||0,comments:parseInt($('#mcomments').value)||0,saves:parseInt($('#msaves').value)||0,shares:parseInt($('#mshares').value)||0},date:m.date};fbSave(it);S.modal=null;toast('✅ 저장 완료!');});
+  $('#if')?.addEventListener('change',e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      S.mImg=ev.target.result;
+      const p=$('#ip');
+      if(p.tagName==='IMG')p.src=S.mImg;
+      else{const img=document.createElement('img');img.src=S.mImg;img.className='img-prev';img.id='ip';p.replaceWith(img);}
+    };
+    r.readAsDataURL(f);
+  });
+  $('#miu')?.addEventListener('input',e=>{S.mImg=e.target.value;});
+  // 삭제
+  $('#mdel')?.addEventListener('click',()=>{
+    if(confirm('삭제하시겠습니까?')){
+      fbDel(m.item.id,m.item.date);
+      S.modal=null;
+      renderFull();
+      toast('🗑️ 삭제됨');
+    }
+  });
+  // 저장 — S.mSt 사용 (핵심 버그 수정)
+  $('#msv')?.addEventListener('click',()=>{
+    const hr=$('#mht').value;
+    const ht=hr.split(/[\s,]+/).filter(h=>h.startsWith('#')&&h.length>1);
+    const iu=$('#miu').value;
+    const base=m.item||blank(m.date);
+    const item={
+      ...base,
+      brand:   S.mBrand,
+      title:   $('#mt').value.trim(),
+      type:    $('#mty').value,
+      format:  $('#mfm').value,
+      assignee:$('#mas').value,
+      priority:$('#mpr').value,
+      message: $('#mmg').value,
+      caption: $('#mcp').value,
+      hashtags:ht,
+      cta:     $('#mct').value,
+      status:  S.mSt,      // ← 핵심: S.mSt 사용
+      viral:   S.mViral,
+      image:   S.mImg||iu,
+      metrics:{
+        likes:   parseInt($('#m_likes').value)||0,
+        comments:parseInt($('#m_comments').value)||0,
+        saves:   parseInt($('#m_saves').value)||0,
+        shares:  parseInt($('#m_shares').value)||0,
+      },
+      date:m.date,
+    };
+    fbSave(item);
+    S.modal=null;
+    renderFull();
+    toast('✅ 저장 완료!');
+  });
 }
+
+// ── 드래그 앤 드롭 ───────────────────────────────────────
 function dStart(e,id,date){S.drag={id,from:date};e.dataTransfer.effectAllowed='move';e.currentTarget.style.opacity='.4';}
 function dEnd(e){e.currentTarget.style.opacity='';S.drag=null;}
-function dDrop(e,to){e.preventDefault();e.currentTarget.classList.remove('drag-over');if(!S.drag)return;const{id,from}=S.drag;if(from!==to)fbMove(id,from,to);S.drag=null;}
-function oAdd(date,e){if(e)e.stopPropagation();S.modal={type:'content',date,item:null};render();bind();}
-function oEdit(id,date,e){if(e)e.stopPropagation();const item=getItems(date).find(x=>x.id===id);if(!item)return;S.modal={type:'content',date,item};render();bind();}
+function dDrop(e,to){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if(!S.drag)return;
+  const{id,from}=S.drag;
+  if(from!==to)fbMove(id,from,to);
+  S.drag=null;
+}
+
+// ── 모달 오프너 ──────────────────────────────────────────
+function oAdd(date,e){
+  if(e)e.stopPropagation();
+  S.modal={type:'content',date,item:null,_initialized:false};
+  renderFull();
+}
+function oEdit(id,date,e){
+  if(e)e.stopPropagation();
+  const item=getItems(date).find(x=>x.id===id);
+  if(!item)return;
+  S.modal={type:'content',date,item,_initialized:false};
+  renderFull();
+}
 </script>
 </body>
 </html>
