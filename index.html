@@ -369,12 +369,12 @@ function buildModal(){
 <div class="fg2">
 <div class="fg"><label class="flabel">콘텐츠 유형</label><select class="fsel" id="mty"><option value="">선택</option>${TYPES.map(t=>`<option value="${t}"${x.type===t?' selected':''}>${t}</option>`).join('')}</select></div>
 <div class="fg"><label class="flabel">포맷</label><select class="fsel" id="mfm"><option value="">선택</option>${FORMATS.map(f=>`<option value="${f}"${x.format===f?' selected':''}>${f}</option>`).join('')}</select></div>
-<div class="fg"><label class="flabel">담당자</label><input class="finput" id="mas" placeholder="이름" value="${esc(x.assignee)}"></div>
+<div class="fg"><label class="flabel">담당자</label><select class="fsel" id="mas"><option value="">선택</option><option value="김나형"${x.assignee==='김나형'?' selected':''}>김나형</option><option value="양소정"${x.assignee==='양소정'?' selected':''}>양소정</option><option value="인플루언서"${x.assignee==='인플루언서'?' selected':''}>인플루언서</option></select></div>
 <div class="fg"><label class="flabel">우선순위</label><select class="fsel" id="mpr">${PRIS.map(p=>`<option value="${p}"${x.priority===p?' selected':''}>${p}</option>`).join('')}</select></div>
 <div class="fg full"><label class="flabel">핵심 메시지</label><input class="finput" id="mmg" value="${esc(x.message)}"></div>
 <div class="fg full"><label class="flabel">캡션</label><textarea class="fta" id="mcp" rows="3">${esc(x.caption)}</textarea></div>
 <div class="fg full"><label class="flabel">해시태그</label><textarea class="fta" id="mht" rows="2">${esc(hs)}</textarea><div class="hash-prev" id="hp">${hp}</div></div>
-<div class="fg full"><label class="flabel">CTA</label><input class="finput" id="mct" value="${esc(x.cta)}"></div>
+<div class="fg full"><label class="flabel">CTA</label><input class="finput" id="mct" value="${esc(x.cta)}"></div><div class="fg full"><label class="flabel">포스팅 URL</label><input class="finput" id="murl" placeholder="https://www.instagram.com/p/..." value="${esc(x.url||'')}"></div><div class="fg full"><label class="flabel">포스팅 URL</label><input class="finput" id="murl" placeholder="https://www.instagram.com/p/..." value="${esc(x.url||'')}"></div><div class="fg full"><label class="flabel">포스팅 URL</label><input class="finput" id="murl" placeholder="https://www.instagram.com/p/..." value="${esc(x.url||'')}"></div><div class="fg full"><label class="flabel">포스팅 URL</label><input class="finput" id="murl" placeholder="https://www.instagram.com/p/..." value="${esc(x.url||'')}"></div><div class="fg full"><label class="flabel">포스팅 URL</label><input class="finput" id="murl" placeholder="https://www.instagram.com/p/..." value="${esc(x.url||'')}"></div><div class="fg full"><label class="flabel">포스팅 URL</label><input class="finput" id="murl" placeholder="https://www.instagram.com/p/..." value="${esc(x.url||'')}"></div>
 </div>
 <div class="sdiv">바이럴 요소</div>
 <div class="viral-row">${VIRAL.map(v=>`<span class="vtag${S.mViral.includes(v)?' on':''}" data-mv="${v}">${v}</span>`).join('')}</div>
@@ -533,7 +533,7 @@ function bindModal(){
       message: $('#mmg').value,
       caption: $('#mcp').value,
       hashtags:ht,
-      cta:     $('#mct').value,
+      cta:     $('#mct').value, url: $('#murl').value, url: $('#murl').value, url: $('#murl').value, url: $('#murl').value, url: $('#murl').value, url: $('#murl').value, url: $('#murl').value,
       status:  S.mSt,      // ← 핵심: S.mSt 사용
       viral:   S.mViral,
       image:   S.mImg||iu,
