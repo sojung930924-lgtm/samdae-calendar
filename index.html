@@ -341,7 +341,7 @@ function buildWeek(tS){
 }
 function card(x){
   const st=getSt(x.status),br=getBrand(x.brand),meta=[x.format,x.type,x.assignee].filter(Boolean).join(' · ');
-  return`<div class="c-card" style="background:${st.bg};border-left-color:${st.c};color:${st.c}" draggable="true" ondragstart="dStart(event,'${x.id}','${x.date}')" ondragend="dEnd(event)" onclick="oEdit('${x.id}','${x.date}',event)">${x.image?`<img src="${esc(x.image)}" style="width:100%;height:34px;object-fit:cover;border-radius:3px;margin-bottom:3px;" alt="">`:''}<div style="display:flex;align-items:center;gap:2px"><span class="brand-badge" style="background:${br.color}22;color:${br.color}">${br.name.slice(0,2)}</span><span class="c-card-title">${esc(x.title||'(제목없음)')}</span></div><div class="c-card-meta">${esc(meta)}</div></div>`;
+  return`<div class="c-card" style="background:${st.bg};border-left-color:${st.c};color:${st.c}" draggable="true" ondragstart="dStart(event,'${x.id}','${x.date}')" ondragend="dEnd(event)" onclick="oEdit('${x.id}','${x.date}',event)">${x.image?`<img src="${esc(x.image)}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;margin-right:6px;float:left;" alt="">`:''}<div style="display:flex;align-items:center;gap:2px"><span class="brand-badge" style="background:${br.color}22;color:${br.color}">${br.name.slice(0,2)}</span><span class="c-card-title">${esc(x.title||'(제목없음)')}</span></div><div class="c-card-meta">${esc(meta)}</div></div>`;
 }
 
 // ── 모달 빌더 ────────────────────────────────────────────
@@ -371,12 +371,7 @@ function buildModal(){
 <div class="fg"><label class="flabel">포맷</label><select class="fsel" id="mfm"><option value="">선택</option>${FORMATS.map(f=>`<option value="${f}"${x.format===f?' selected':''}>${f}</option>`).join('')}</select></div>
 <div class="fg"><label class="flabel">담당자</label><select class="fsel" id="mas"><option value="">선택</option><option value="김나형"${x.assignee==='김나형'?' selected':''}>김나형</option><option value="양소정"${x.assignee==='양소정'?' selected':''}>양소정</option><option value="인플루언서"${x.assignee==='인플루언서'?' selected':''}>인플루언서</option></select></div>
 <div class="fg"><label class="flabel">우선순위</label><select class="fsel" id="mpr">${PRIS.map(p=>`<option value="${p}"${x.priority===p?' selected':''}>${p}</option>`).join('')}</select></div>
-<div class="fg full"><label class="flabel">핵심 메시지</label><input class="finput" id="mmg" value="${esc(x.message)}"></div>
-<div class="fg full"><label class="flabel">캡션</label><textarea class="fta" id="mcp" rows="3">${esc(x.caption)}</textarea></div>
-<div class="fg full"><label class="flabel">해시태그</label><textarea class="fta" id="mht" rows="2">${esc(hs)}</textarea><div class="hash-prev" id="hp">${hp}</div></div>
-<div class="fg full"><label class="flabel">CTA</label><input class="finput" id="mct" value="${esc(x.cta)}"></div><div class="fg full"><label class="flabel">포스팅 URL</label><input class="finput" id="murl" placeholder="https://www.instagram.com/p/..." value="${esc(x.url||'')}"></div><div class="fg full"><label class="flabel">포스팅 URL</label><input class="finput" id="murl" placeholder="https://www.instagram.com/p/..." value="${esc(x.url||'')}"></div><div class="fg full"><label class="flabel">포스팅 URL</label><input class="finput" id="murl" placeholder="https://www.instagram.com/p/..." value="${esc(x.url||'')}"></div><div class="fg full"><label class="flabel">포스팅 URL</label><input class="finput" id="murl" placeholder="https://www.instagram.com/p/..." value="${esc(x.url||'')}"></div><div class="fg full"><label class="flabel">포스팅 URL</label><input class="finput" id="murl" placeholder="https://www.instagram.com/p/..." value="${esc(x.url||'')}"></div><div class="fg full"><label class="flabel">포스팅 URL</label><input class="finput" id="murl" placeholder="https://www.instagram.com/p/..." value="${esc(x.url||'')}"></div>
-</div>
-<div class="sdiv">바이럴 요소</div>
+<div class="fg full"><label class="flabel">포스팅 URL</label><input class="finput" id="murl" placeholder="https://www.instagram.com/p/..." value="${esc(x.url||'')}"></div>
 <div class="viral-row">${VIRAL.map(v=>`<span class="vtag${S.mViral.includes(v)?' on':''}" data-mv="${v}">${v}</span>`).join('')}</div>
 <div class="sdiv">이미지</div>
 ${S.mImg?`<img src="${esc(S.mImg)}" class="img-prev" id="ip" alt="">`:'<div id="ip"></div>'}
